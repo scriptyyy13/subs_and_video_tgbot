@@ -1,0 +1,5 @@
+models/*
+videos/*
+.venv
+.idea
+__pycache__
