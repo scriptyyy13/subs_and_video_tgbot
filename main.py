@@ -12,6 +12,7 @@ import wave
 from scipy.signal import wiener
 from vosk import Model, KaldiRecognizer
 import librosa
+import conf
 
 
 def add_subtitles_to_video(video_file, subtitle_file, output_file):
@@ -111,7 +112,7 @@ def recognize_audio(input_audio_file,
         print(results)
         return results
 
-import conf
+
 TOKEN = conf.BOT_TOKEN
 
 bot = telebot.TeleBot(TOKEN)
@@ -160,7 +161,7 @@ def send_text(message):
             if passed == 3:
                 bot.send_message(message.chat.id,
                                  f'Начинается этап 4/{proc_numb} \nРаспознование речи \nЭто займет до пяти минут\n')
-                recogniz = recognize_audio(f"videos/{message.from_user.id}_dn.wav", f"models/vosk-model-ru-0.42")
+                recogniz = recognize_audio(f"videos/{message.from_user.id}_dn.wav", conf.MODEL_NAME)
                 os.remove(f"videos/{message.from_user.id}_dn.wav")
                 passed = 4
 
