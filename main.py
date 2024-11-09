@@ -13,8 +13,6 @@ from scipy.signal import wiener
 from vosk import Model, KaldiRecognizer
 import librosa
 import conf
-
-
 import fuctions
 
 
@@ -42,37 +40,37 @@ def send_text(message):
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
 
-        if get_length(src) < conf.MAX_VIDEO_DURATION:
+        if fuctions.get_length(src) < conf.MAX_VIDEO_DURATION:
             bot.reply_to(message, "Успешно сохранено!")
             proc_numb = 6
             bot.send_message(message.chat.id, f'Начинается этап 1/{proc_numb} \nОтсоедиенение аудио')
             src_audio = f"videos/{message.from_user.id}.mp3"
-            extract_audio(src, src_audio)
+            fuctions.extract_audio(src, src_audio)
             passed = 1
 
             if passed == 1:
                 bot.send_message(message.chat.id, f'Начинается этап 2/{proc_numb} \nУдаление шума')
 
-                remove_noise(src_audio, f"videos/{message.from_user.id}_dn.mp3")
+                fuctions.remove_noise(src_audio, f"videos/{message.from_user.id}_dn.mp3")
                 passed = 2
                 os.remove(src_audio)
 
             if passed == 2:
                 bot.send_message(message.chat.id, f'Начинается этап 3/{proc_numb} \nКонвертация аудио')
-                convert_mp3_to_wav(f"videos/{message.from_user.id}_dn.mp3", f"videos/{message.from_user.id}_dn.wav")
+                fuctions.convert_mp3_to_wav(f"videos/{message.from_user.id}_dn.mp3", f"videos/{message.from_user.id}_dn.wav")
                 passed = 3
                 os.remove(f"videos/{message.from_user.id}_dn.mp3")
 
             if passed == 3:
                 bot.send_message(message.chat.id,
                                  f'Начинается этап 4/{proc_numb} \nРаспознование речи \nЭто займет до пяти минут\n')
-                recogniz = recognize_audio(f"videos/{message.from_user.id}_dn.wav", conf.MODEL_NAME)
+                recogniz = fuctions.recognize_audio(f"videos/{message.from_user.id}_dn.wav", conf.MODEL_NAME)
                 os.remove(f"videos/{message.from_user.id}_dn.wav")
                 passed = 4
 
             if passed == 4:
                 bot.send_message(message.chat.id, f'Начинается этап 5/{proc_numb} \nГенерация субтитров')
-                generate_srt_file(recogniz, f"videos/{message.from_user.id}_subs.srt")
+                fuctions.generate_srt_file(recogniz, f"videos/{message.from_user.id}_subs.srt")
                 with open(f"videos/{message.from_user.id}_subs.srt", 'rb') as file:
                     bot.send_document(message.chat.id, file,
                                       caption=os.path.basename(f"videos/{message.from_user.id}_subs.srt"))
@@ -82,7 +80,7 @@ def send_text(message):
             if passed == 5:
                 bot.send_message(message.chat.id, f'Начинается этап 6/{proc_numb} \nВшивание субтитров в видео')
                 result_file = f"videos/result_{message.from_user.id}.mp4"
-                add_subtitles_to_video(src, f"videos/{message.from_user.id}_subs.srt", result_file)
+                fuctions.add_subtitles_to_video(src, f"videos/{message.from_user.id}_subs.srt", result_file)
                 with open(result_file, 'rb') as video:
                     bot.send_video(message.chat.id, video, caption=os.path.basename(result_file))
                 bot.send_message(message.chat.id, f'Завершено! \nДля повторения процесса отправьте новое видео!')

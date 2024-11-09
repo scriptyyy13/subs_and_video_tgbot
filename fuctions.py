@@ -93,7 +93,7 @@ def remove_noise(input_audio_file, output_file):  # Функция для уда
 
 def recognize_audio(input_audio_file,
                     model_path):  # Функция для распознавания речи в аудиофайле с использованием модели.
-    model = Model(model_path)  # Инициализация модели для распознавания
+    model = Model(f"./models/{model_path}")  # Инициализация модели для распознавания
     with wave.open(input_audio_file, "rb") as wf:  # Открытие аудиофайла для чтения
         rec = KaldiRecognizer(model, wf.getframerate())
         rec.SetWords(True)
